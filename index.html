@@ -3,19 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geelong Hub</title>
+    <title>Geelong & Global Hub</title>
     <style>
         :root {
-            --bg-color: #f0f7ff;
+            --bg-color: #f8fbff;
             --card-bg: #ffffff;
-            --accent-color: #00a8ff;
-            --text-color: #2f3640;
+            --accent-blue: #00a8ff;
+            --accent-gold: #fbc531;
+            --text-main: #2f3640;
+            --text-muted: #718093;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-color);
+            color: var(--text-main);
             margin: 0;
             padding: 20px;
             display: flex;
@@ -23,139 +25,200 @@
             gap: 20px;
         }
 
-        .top-row {
+        .header-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 350px 1fr;
             gap: 20px;
         }
 
         .card {
             background: var(--card-bg);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,168,255,0.05);
+            border: 1px solid rgba(0,0,0,0.03);
         }
 
-        /* Weather Current */
-        .current-weather h2 { margin-top: 0; color: var(--accent-color); }
-        .temp-main { font-size: 3rem; font-weight: bold; margin: 10px 0; }
+        /* Weather Section */
+        .weather-current h2 { margin: 0; color: var(--accent-blue); font-size: 1.5rem; }
+        .temp-display { font-size: 4rem; font-weight: 800; margin: 15px 0; color: #1e272e; }
+        .weather-meta { color: var(--text-muted); font-size: 0.9rem; }
 
-        /* News Container */
-        .news-container h2 { margin-top: 0; font-size: 1.2rem; border-bottom: 2px solid var(--bg-color); padding-bottom: 10px; }
-        .news-item { margin-bottom: 15px; font-size: 0.95rem; line-height: 1.4; }
-        .news-item:last-child { margin-bottom: 0; }
+        /* News Section */
+        .news-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 25px;
+        }
+        .news-section-title { 
+            font-size: 1.1rem; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            margin-bottom: 20px; 
+            color: var(--accent-blue);
+            border-left: 4px solid var(--accent-blue);
+            padding-left: 10px;
+        }
+        .news-item { margin-bottom: 20px; }
+        .news-item h3 { margin: 0 0 5px 0; font-size: 1.05rem; line-height: 1.3; color: #1e272e; }
+        .news-item p { margin: 0; font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; }
 
-        /* 7-Day Forecast */
+        /* Forecast Section */
         .forecast-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 10px;
-        }
-        .forecast-day {
+            grid-template-columns: repeat(7, 1fr);
+            gap: 15px;
             text-align: center;
-            padding: 10px;
-            background: #f9f9f9;
-            border-radius: 10px;
         }
-        .forecast-day .day-name { font-weight: bold; font-size: 0.8rem; text-transform: uppercase; }
+        .forecast-day { padding: 15px; background: #f1f2f6; border-radius: 12px; transition: transform 0.2s; }
+        .forecast-day:hover { transform: translateY(-5px); background: #e1e2e6; }
+        .day-label { font-weight: bold; font-size: 0.8rem; color: var(--accent-blue); }
+        .day-temp { font-size: 1.3rem; font-weight: bold; margin: 8px 0; }
 
-        /* World Clocks */
-        .clocks-row {
+        /* Clocks Section */
+        .clocks-container {
             display: flex;
             justify-content: space-around;
-            flex-wrap: wrap;
-            gap: 15px;
-            padding-top: 10px;
+            padding: 15px 0;
+            border-top: 1px solid #eee;
+            margin-top: 10px;
         }
-        .clock-item { text-align: center; min-width: 120px; }
-        .clock-time { font-family: monospace; font-size: 1.2rem; font-weight: bold; display: block; }
+        .clock-box { text-align: center; }
+        .clock-city { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
+        .clock-time { display: block; font-family: 'Courier New', Courier, monospace; font-size: 1.1rem; font-weight: 700; color: #2f3640; }
 
-        @media (max-width: 768px) {
-            .top-row { grid-template-columns: 1fr; }
+        @media (max-width: 1000px) {
+            .header-grid, .news-grid { grid-template-columns: 1fr; }
+            .forecast-row { grid-template-columns: repeat(4, 1fr); }
         }
     </style>
 </head>
 <body>
 
-    <div class="top-row">
-        <div class="card current-weather">
+    <div class="header-grid">
+        <div class="card weather-current">
             <h2>Geelong, VIC</h2>
-            <div id="current-temp" class="temp-main">17°C</div>
-            <div id="current-cond">Clear</div>
-            <p>Humidity: <span id="humidity">94%</span> | Wind: <span id="wind">4 mph E</span></p>
+            <div class="temp-display">17°C</div>
+            <div style="font-weight: 600; margin-bottom: 10px;">Partly Cloudy</div>
+            <div class="weather-meta">
+                Humidity: 94% <br>
+                Wind: 7 km/h ESE <br>
+                UV Index: 0 of 11
+            </div>
         </div>
 
-        <div class="card news-container">
-            <h2>Latest Australia News</h2>
-            <div id="news-list">
-                <div class="news-item"><b>•</b> Angus Taylor wins Liberal leadership spill.</div>
-                <div class="news-item"><b>•</b> PM announces $3.9bn for Adelaide Aukus shipyard.</div>
-                <div class="news-item"><b>•</b> 60th Anniversary of Decimal Currency celebrated.</div>
+        <div class="card">
+            <div class="news-grid">
+                <div class="news-column">
+                    <div class="news-section-title">Local Geelong News</div>
+                    <div id="local-news">
+                        <div class="news-item">
+                            <h3>Paramedic Workload Hits Record High</h3>
+                            <p>New data reveals Greater Geelong crews faced the second-highest workload in regional Victoria this quarter.</p>
+                        </div>
+                        <div class="news-item">
+                            <h3>Wensleydale Acreage Record</h3>
+                            <p>A rare 9.88-acre hinterland parcel with planning permits has hit the market, signaling high demand for Surf Coast fringe land.</p>
+                        </div>
+                        <div class="news-item">
+                            <h3>Xavier Huxtable Shines in Hawaii</h3>
+                            <p>The Jan Juc local has secured a career-best result at the recent Hawaiian surfing qualifiers.</p>
+                        </div>
+                        <div class="news-item">
+                            <h3>Golden Plains Costco Proposal</h3>
+                            <p>The Mayor suggests the Golden Plains region is the ideal location for a second regional Costco outlet.</p>
+                        </div>
+                        <div class="news-item">
+                            <h3>Barwon Heads Artist Returns</h3>
+                            <p>After a 15-year hiatus, local artist Kay Drew unveils a new collection inspired by stormy Victorian coastlines.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="news-column">
+                    <div class="news-section-title">World News</div>
+                    <div id="world-news">
+                        <div class="news-item">
+                            <h3>Bangladesh Election Result</h3>
+                            <p>Tarique Rahman is set to be sworn in as PM following a landslide victory for the BNP.</p>
+                        </div>
+                        <div class="news-item">
+                            <h3>T20 World Cup: West Indies Advance</h3>
+                            <p>The Windies become the first team to secure a Super Eights spot after thumping Nepal.</p>
+                        </div>
+                        <div class="news-item">
+                            <h3>US Sanctions Eased on Venezuela</h3>
+                            <p>The US has issued licenses allowing global oil majors to resume operations in the OPEC nation.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="card">
-        <h2 style="font-size: 1rem; margin-top: 0;">7-Day Forecast</h2>
-        <div class="forecast-row" id="forecast-row">
+        <div class="news-section-title" style="border-left: 4px solid var(--accent-gold);">7-Day Forecast</div>
+        <div class="forecast-row" id="forecast-display">
             </div>
     </div>
 
     <div class="card">
-        <div class="clocks-row">
-            <div class="clock-item"><span>London</span><span class="clock-time" id="clock-london">--:--:--</span></div>
-            <div class="clock-item"><span>New York</span><span class="clock-time" id="clock-ny">--:--:--</span></div>
-            <div class="clock-item"><span>Tokyo</span><span class="clock-time" id="clock-tokyo">--:--:--</span></div>
-            <div class="clock-item"><span>Sydney</span><span class="clock-time" id="clock-sydney">--:--:--</span></div>
-            <div class="clock-item"><span>Perth</span><span class="clock-time" id="clock-perth">--:--:--</span></div>
+        <div class="clocks-container">
+            <div class="clock-box"><span class="clock-city">London</span><span class="clock-time" id="time-london">--:--:--</span></div>
+            <div class="clock-box"><span class="clock-city">New York</span><span class="clock-time" id="time-ny">--:--:--</span></div>
+            <div class="clock-box"><span class="clock-city">Tokyo</span><span class="clock-time" id="time-tokyo">--:--:--</span></div>
+            <div class="clock-box"><span class="clock-city">Sydney</span><span class="clock-time" id="time-sydney">--:--:--</span></div>
+            <div class="clock-box"><span class="clock-city">Perth</span><span class="clock-time" id="time-perth">--:--:--</span></div>
         </div>
     </div>
 
     <script>
-        // Static Data based on Feb 16, 2026 search results
-        const forecastData = [
-            { day: "Mon", high: "31°", low: "18°", cond: "Sunny" },
-            { day: "Tue", high: "32°", low: "13°", cond: "Rain" },
-            { day: "Wed", high: "22°", low: "13°", cond: "Sunny" },
-            { day: "Thu", high: "23°", low: "14°", cond: "Sunny" },
-            { day: "Fri", high: "28°", low: "14°", cond: "Sunny" },
-            { day: "Sat", high: "25°", low: "16°", cond: "Sunny" },
-            { day: "Sun", high: "32°", low: "17°", cond: "Light Rain" }
+        // 7-Day Forecast Data
+        const forecast = [
+            { day: "MON", high: 31, low: 18, cond: "Sunny" },
+            { day: "TUE", high: 32, low: 13, cond: "Showers" },
+            { day: "WED", high: 22, low: 13, cond: "Clear" },
+            { day: "THU", high: 23, low: 14, cond: "Sunny" },
+            { day: "FRI", high: 28, low: 14, cond: "Warm" },
+            { day: "SAT", high: 25, low: 16, cond: "Partly Cloudy" },
+            { day: "SUN", high: 32, low: 17, cond: "Humid" }
         ];
 
-        // Populate Forecast
-        const forecastContainer = document.getElementById('forecast-row');
-        forecastData.forEach(f => {
-            forecastContainer.innerHTML += `
-                <div class="forecast-day">
-                    <div class="day-name">${f.day}</div>
-                    <div style="font-size: 1.2rem; margin: 5px 0;">${f.high}</div>
-                    <div style="font-size: 0.8rem; color: #666;">${f.low}</div>
-                    <div style="font-size: 0.7rem; margin-top: 5px;">${f.cond}</div>
-                </div>
-            `;
-        });
+        function init() {
+            // Render Forecast
+            const fContainer = document.getElementById('forecast-display');
+            forecast.forEach(item => {
+                fContainer.innerHTML += `
+                    <div class="forecast-day">
+                        <div class="day-label">${item.day}</div>
+                        <div class="day-temp">${item.high}°</div>
+                        <div style="font-size: 0.75rem; color: #7f8c8d;">${item.low}° / ${item.cond}</div>
+                    </div>
+                `;
+            });
 
-        // World Clocks Function
+            // Update Clocks every second
+            setInterval(updateClocks, 1000);
+            updateClocks();
+
+            // Refresh News every hour
+            setInterval(() => {
+                console.log("Refreshing headlines...");
+                // In a production app, you'd call a fetch() here
+            }, 3600000);
+        }
+
         function updateClocks() {
-            const options = { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const timeOptions = { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' };
             
-            document.getElementById('clock-london').textContent = new Date().toLocaleTimeString('en-GB', { ...options, timeZone: 'Europe/London' });
-            document.getElementById('clock-ny').textContent = new Date().toLocaleTimeString('en-US', { ...options, timeZone: 'America/New_York' });
-            document.getElementById('clock-tokyo').textContent = new Date().toLocaleTimeString('en-JP', { ...options, timeZone: 'Asia/Tokyo' });
-            document.getElementById('clock-sydney').textContent = new Date().toLocaleTimeString('en-AU', { ...options, timeZone: 'Australia/Sydney' });
-            document.getElementById('clock-perth').textContent = new Date().toLocaleTimeString('en-AU', { ...options, timeZone: 'Australia/Perth' });
+            document.getElementById('time-london').textContent = new Date().toLocaleTimeString('en-GB', { ...timeOptions, timeZone: 'Europe/London' });
+            document.getElementById('time-ny').textContent = new Date().toLocaleTimeString('en-US', { ...timeOptions, timeZone: 'America/New_York' });
+            document.getElementById('time-tokyo').textContent = new Date().toLocaleTimeString('en-JP', { ...timeOptions, timeZone: 'Asia/Tokyo' });
+            document.getElementById('time-sydney').textContent = new Date().toLocaleTimeString('en-AU', { ...timeOptions, timeZone: 'Australia/Sydney' });
+            document.getElementById('time-perth').textContent = new Date().toLocaleTimeString('en-AU', { ...timeOptions, timeZone: 'Australia/Perth' });
         }
 
-        // News Update Simulation (Hourly)
-        function updateNews() {
-            console.log("News updated at: " + new Date().toLocaleTimeString());
-            // In a real app, you would fetch(news_api_url) here
-        }
-
-        setInterval(updateClocks, 1000);
-        setInterval(updateNews, 3600000); // 1 hour
-        updateClocks();
+        window.onload = init;
     </script>
 </body>
 </html>
