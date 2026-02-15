@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geelong Hub</title>
+    <style>
+        :root {
+            --bg-color: #f0f7ff;
+            --card-bg: #ffffff;
+            --accent-color: #00a8ff;
+            --text-color: #2f3640;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .top-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        /* Weather Current */
+        .current-weather h2 { margin-top: 0; color: var(--accent-color); }
+        .temp-main { font-size: 3rem; font-weight: bold; margin: 10px 0; }
+
+        /* News Container */
+        .news-container h2 { margin-top: 0; font-size: 1.2rem; border-bottom: 2px solid var(--bg-color); padding-bottom: 10px; }
+        .news-item { margin-bottom: 15px; font-size: 0.95rem; line-height: 1.4; }
+        .news-item:last-child { margin-bottom: 0; }
+
+        /* 7-Day Forecast */
+        .forecast-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+        }
+        .forecast-day {
+            text-align: center;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+        .forecast-day .day-name { font-weight: bold; font-size: 0.8rem; text-transform: uppercase; }
+
+        /* World Clocks */
+        .clocks-row {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding-top: 10px;
+        }
+        .clock-item { text-align: center; min-width: 120px; }
+        .clock-time { font-family: monospace; font-size: 1.2rem; font-weight: bold; display: block; }
+
+        @media (max-width: 768px) {
+            .top-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-row">
+        <div class="card current-weather">
+            <h2>Geelong, VIC</h2>
+            <div id="current-temp" class="temp-main">17°C</div>
+            <div id="current-cond">Clear</div>
+            <p>Humidity: <span id="humidity">94%</span> | Wind: <span id="wind">4 mph E</span></p>
+        </div>
+
+        <div class="card news-container">
+            <h2>Latest Australia News</h2>
+            <div id="news-list">
+                <div class="news-item"><b>•</b> Angus Taylor wins Liberal leadership spill.</div>
+                <div class="news-item"><b>•</b> PM announces $3.9bn for Adelaide Aukus shipyard.</div>
+                <div class="news-item"><b>•</b> 60th Anniversary of Decimal Currency celebrated.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2 style="font-size: 1rem; margin-top: 0;">7-Day Forecast</h2>
+        <div class="forecast-row" id="forecast-row">
+            </div>
+    </div>
+
+    <div class="card">
+        <div class="clocks-row">
+            <div class="clock-item"><span>London</span><span class="clock-time" id="clock-london">--:--:--</span></div>
+            <div class="clock-item"><span>New York</span><span class="clock-time" id="clock-ny">--:--:--</span></div>
+            <div class="clock-item"><span>Tokyo</span><span class="clock-time" id="clock-tokyo">--:--:--</span></div>
+            <div class="clock-item"><span>Sydney</span><span class="clock-time" id="clock-sydney">--:--:--</span></div>
+            <div class="clock-item"><span>Perth</span><span class="clock-time" id="clock-perth">--:--:--</span></div>
+        </div>
+    </div>
+
+    <script>
+        // Static Data based on Feb 16, 2026 search results
+        const forecastData = [
+            { day: "Mon", high: "31°", low: "18°", cond: "Sunny" },
+            { day: "Tue", high: "32°", low: "13°", cond: "Rain" },
+            { day: "Wed", high: "22°", low: "13°", cond: "Sunny" },
+            { day: "Thu", high: "23°", low: "14°", cond: "Sunny" },
+            { day: "Fri", high: "28°", low: "14°", cond: "Sunny" },
+            { day: "Sat", high: "25°", low: "16°", cond: "Sunny" },
+            { day: "Sun", high: "32°", low: "17°", cond: "Light Rain" }
+        ];
+
+        // Populate Forecast
+        const forecastContainer = document.getElementById('forecast-row');
+        forecastData.forEach(f => {
+            forecastContainer.innerHTML += `
+                <div class="forecast-day">
+                    <div class="day-name">${f.day}</div>
+                    <div style="font-size: 1.2rem; margin: 5px 0;">${f.high}</div>
+                    <div style="font-size: 0.8rem; color: #666;">${f.low}</div>
+                    <div style="font-size: 0.7rem; margin-top: 5px;">${f.cond}</div>
+                </div>
+            `;
+        });
+
+        // World Clocks Function
+        function updateClocks() {
+            const options = { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            
+            document.getElementById('clock-london').textContent = new Date().toLocaleTimeString('en-GB', { ...options, timeZone: 'Europe/London' });
+            document.getElementById('clock-ny').textContent = new Date().toLocaleTimeString('en-US', { ...options, timeZone: 'America/New_York' });
+            document.getElementById('clock-tokyo').textContent = new Date().toLocaleTimeString('en-JP', { ...options, timeZone: 'Asia/Tokyo' });
+            document.getElementById('clock-sydney').textContent = new Date().toLocaleTimeString('en-AU', { ...options, timeZone: 'Australia/Sydney' });
+            document.getElementById('clock-perth').textContent = new Date().toLocaleTimeString('en-AU', { ...options, timeZone: 'Australia/Perth' });
+        }
+
+        // News Update Simulation (Hourly)
+        function updateNews() {
+            console.log("News updated at: " + new Date().toLocaleTimeString());
+            // In a real app, you would fetch(news_api_url) here
+        }
+
+        setInterval(updateClocks, 1000);
+        setInterval(updateNews, 3600000); // 1 hour
+        updateClocks();
+    </script>
+</body>
+</html>
