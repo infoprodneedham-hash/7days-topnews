@@ -6,16 +6,15 @@
     <title>Australia Hub | Geelong</title>
     <style>
         :root {
-            --bg-color: #f4f7f9;
+            --bg-color: #f0f4f8;
             --card-bg: #ffffff;
             --accent-blue: #0984e3;
-            --accent-green: #00b894;
             --text-dark: #2d3436;
             --text-light: #636e72;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-dark);
             margin: 0;
@@ -27,75 +26,78 @@
 
         .header-layout {
             display: grid;
-            grid-template-columns: 320px 1fr;
+            grid-template-columns: 350px 1fr;
             gap: 20px;
         }
 
         .card {
             background: var(--card-bg);
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
 
-        /* Weather Styles */
-        .weather-box h2 { margin: 0; font-size: 1.4rem; color: var(--accent-blue); }
-        .current-temp { font-size: 3.5rem; font-weight: 800; margin: 10px 0; }
-        .details { font-size: 0.9rem; color: var(--text-light); line-height: 1.6; }
+        /* Weather Section with Large Clock */
+        .weather-box h2 { margin: 0; font-size: 1.3rem; color: var(--accent-blue); }
+        .current-temp { font-size: 4rem; font-weight: 800; margin: 5px 0; letter-spacing: -2px; }
+        .local-time-large { 
+            font-size: 2.2rem; 
+            font-weight: 700; 
+            color: var(--text-dark); 
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+        }
+        .weather-details { font-size: 0.95rem; color: var(--text-light); line-height: 1.5; }
 
-        /* News Styles */
+        /* News Section */
         .news-grid {
             display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
+            grid-template-columns: 1fr 1fr;
             gap: 30px;
         }
         .section-title {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1.2px;
-            color: var(--text-light);
+            letter-spacing: 1.5px;
+            color: var(--accent-blue);
             margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            border-bottom: 2px solid #f0f4f8;
+            padding-bottom: 8px;
         }
-        .section-title::after { content: ""; flex: 1; height: 1px; background: #eee; }
-
-        .news-item { margin-bottom: 18px; }
-        .news-item h3 { margin: 0 0 4px 0; font-size: 1rem; color: #1e272e; line-height: 1.3; }
+        .news-item { margin-bottom: 20px; }
+        .news-item h3 { margin: 0 0 5px 0; font-size: 1rem; line-height: 1.4; color: #1e272e; }
         .news-item p { margin: 0; font-size: 0.85rem; color: var(--text-light); line-height: 1.5; }
 
-        /* Forecast Styles */
-        .forecast-container {
+        /* Forecast Bar */
+        .forecast-row {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 12px;
+            gap: 10px;
         }
-        .forecast-card {
+        .forecast-day {
             text-align: center;
-            padding: 15px;
+            padding: 15px 10px;
             background: #f8f9fa;
-            border-radius: 8px;
-            border: 1px solid #f1f1f1;
+            border-radius: 12px;
         }
-        .day-name { font-weight: 700; font-size: 0.75rem; color: var(--accent-blue); }
-        .day-high { font-size: 1.2rem; font-weight: 800; margin: 5px 0; }
+        .day-label { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); }
+        .day-temp { font-size: 1.4rem; font-weight: 800; margin: 5px 0; }
 
-        /* Clock Styles */
-        .clocks-strip {
+        /* World Clocks Bar */
+        .world-clocks {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-around;
             flex-wrap: wrap;
             gap: 15px;
         }
-        .clock-unit { text-align: center; flex: 1; min-width: 130px; }
-        .clock-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--text-light); }
-        .clock-time { display: block; font-family: 'Monaco', 'Consolas', monospace; font-size: 1.1rem; font-weight: 700; }
+        .clock-item { text-align: center; }
+        .clock-name { font-size: 0.7rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; }
+        .clock-val { display: block; font-size: 1.1rem; font-weight: 700; font-family: monospace; }
 
-        @media (max-width: 900px) {
+        @media (max-width: 1000px) {
             .header-layout, .news-grid { grid-template-columns: 1fr; }
-            .forecast-container { grid-template-columns: repeat(4, 1fr); }
+            .forecast-row { grid-template-columns: repeat(4, 1fr); }
         }
     </style>
 </head>
@@ -105,53 +107,54 @@
         <div class="card weather-box">
             <h2>Geelong, VIC</h2>
             <div class="current-temp">17°C</div>
-            <div style="font-weight: 600;">Partly Cloudy</div>
-            <div class="details">
-                Feels like 16°C <br>
-                Humidity: 94% <br>
-                Wind: 7 km/h ESE
+            <div id="local-clock" class="local-time-large">--:--:-- --</div>
+            <div style="font-weight: 600; margin-bottom: 5px;">Clear Skies</div>
+            <div class="weather-details">
+                Humidity: 94%<br>
+                Wind: 4 mph East<br>
+                UV Index: 0 (Night)
             </div>
         </div>
 
         <div class="card">
             <div class="news-grid">
                 <div>
-                    <div class="section-title">National News</div>
+                    <div class="section-title">Australia News</div>
                     <div class="news-item">
-                        <h3>Aussie Winter Olympic Record</h3>
-                        <p>Jakara Anthony secures gold in Dual Moguls at Milano Cortina, contributing to Australia's record Winter medal haul.</p>
+                        <h3>Olympic Gold for Jakara Anthony</h3>
+                        <p>Aussie moguls star secures gold at Milano Cortina 2026, leading a record Winter Games medal haul.</p>
                     </div>
                     <div class="news-item">
-                        <h3>$30bn AUKUS Shipyard Reveal</h3>
-                        <p>PM Anthony Albanese dismisses concerns over Adelaide shipyard costs, labeling the investment "generational."</p>
+                        <h3>Taylor Reshuffles Liberal Front Bench</h3>
+                        <p>New Opposition Leader Angus Taylor prepares a new team to focus on immigration and economic values.</p>
                     </div>
                     <div class="news-item">
-                        <h3>Refreshed Liberal Leadership Priorities</h3>
-                        <p>Angus Taylor outlines a new immigration crackdown and security vetting strategy in his first days as opposition leader.</p>
+                        <h3>EU Trade Deal "Billions" Boost</h3>
+                        <p>Trade Minister Farrell signals a breakthrough in long-stalled talks, promising cheaper European imports.</p>
                     </div>
                     <div class="news-item">
-                        <h3>EU Trade Deal Closer to Reality</h3>
-                        <p>Analysts suggest a billion-dollar boost for the Australian economy as a major trade agreement with Europe nears completion.</p>
+                        <h3>60 Years of Decimal Currency</h3>
+                        <p>Australia celebrates the anniversary of 'C-Day' when the dollar officially replaced the pound.</p>
                     </div>
                     <div class="news-item">
-                        <h3>NSW Protests Investigation</h3>
-                        <p>A watchdog is set to probe police conduct after a controversial video surfaced of a prayer disruption during a Sydney protest.</p>
+                        <h3>AUKUS Shipyard Funding Confirmed</h3>
+                        <p>The PM dismisses cost concerns as the first $2.8bn is allocated for the Adelaide submarine facility.</p>
                     </div>
                 </div>
 
                 <div>
                     <div class="section-title">World News</div>
                     <div class="news-item">
-                        <h3>Bangladesh Power Shift</h3>
-                        <p>Tarique Rahman is sworn in as Prime Minister following a landslide victory for the BNP in Dhaka.</p>
+                        <h3>Bangladesh Power Transition</h3>
+                        <p>Tarique Rahman ascends to PM following a landslide BNP victory in recent credible elections.</p>
                     </div>
                     <div class="news-item">
-                        <h3>T20 World Cup: West Indies Secure Spot</h3>
-                        <p>The Windies become the first team to enter the Super Eights after a dominant victory over Nepal.</p>
+                        <h3>T20 World Cup: West Indies Advance</h3>
+                        <p>The Windies become the first team to secure a Super Eights spot after defeating Nepal.</p>
                     </div>
                     <div class="news-item">
-                        <h3>US Sanctions on Venezuela Eased</h3>
-                        <p>The White House issues licenses allowing oil majors to resume operations, seeking to stabilize global energy markets.</p>
+                        <h3>US-Russia "Presidents Day" Talks</h3>
+                        <p>Global markets watch closely as new diplomatic channels open in Geneva ahead of the US holiday.</p>
                     </div>
                 </div>
             </div>
@@ -160,72 +163,47 @@
 
     <div class="card">
         <div class="section-title">7-Day Forecast</div>
-        <div class="forecast-container" id="forecast-render">
-            </div>
+        <div class="forecast-row">
+            <div class="forecast-day"><div class="day-label">MON</div><div class="day-temp">31°</div><div style="font-size:0.7rem">Sunny</div></div>
+            <div class="forecast-day"><div class="day-label">TUE</div><div class="day-temp">32°</div><div style="font-size:0.7rem">Rain</div></div>
+            <div class="forecast-day"><div class="day-label">WED</div><div class="day-temp">22°</div><div style="font-size:0.7rem">Clear</div></div>
+            <div class="forecast-day"><div class="day-label">THU</div><div class="day-temp">23°</div><div style="font-size:0.7rem">Sunny</div></div>
+            <div class="forecast-day"><div class="day-label">FRI</div><div class="day-temp">28°</div><div style="font-size:0.7rem">Warm</div></div>
+            <div class="forecast-day"><div class="day-label">SAT</div><div class="day-temp">25°</div><div style="font-size:0.7rem">Cloudy</div></div>
+            <div class="forecast-day"><div class="day-label">SUN</div><div class="day-temp">32°</div><div style="font-size:0.7rem">Humid</div></div>
+        </div>
     </div>
 
     <div class="card">
-        <div class="clocks-strip">
-            <div class="clock-unit"><span class="clock-label">London</span><span class="clock-time" id="clock-london">--:--:-- --</span></div>
-            <div class="clock-unit"><span class="clock-label">New York</span><span class="clock-time" id="clock-ny">--:--:-- --</span></div>
-            <div class="clock-unit"><span class="clock-label">Tokyo</span><span class="clock-time" id="clock-tokyo">--:--:-- --</span></div>
-            <div class="clock-unit"><span class="clock-label">Sydney</span><span class="clock-time" id="clock-sydney">--:--:-- --</span></div>
-            <div class="clock-unit"><span class="clock-label">Perth</span><span class="clock-time" id="clock-perth">--:--:-- --</span></div>
+        <div class="world-clocks">
+            <div class="clock-item"><span class="clock-name">London</span><span id="tz-london" class="clock-val">--:--:-- --</span></div>
+            <div class="clock-item"><span class="clock-name">New York</span><span id="tz-ny" class="clock-val">--:--:-- --</span></div>
+            <div class="clock-item"><span class="clock-name">Tokyo</span><span id="tz-tokyo" class="clock-val">--:--:-- --</span></div>
+            <div class="clock-item"><span class="clock-name">Sydney</span><span id="tz-sydney" class="clock-val">--:--:-- --</span></div>
+            <div class="clock-item"><span class="clock-name">Perth</span><span id="tz-perth" class="clock-val">--:--:-- --</span></div>
         </div>
     </div>
 
     <script>
-        const forecastData = [
-            { d: "MON", h: 31, l: 18, c: "Sunny" },
-            { d: "TUE", h: 32, l: 13, c: "Rain" },
-            { d: "WED", h: 22, l: 13, c: "Cloudy" },
-            { d: "THU", h: 23, l: 14, c: "Sunny" },
-            { d: "FRI", h: 28, l: 14, c: "Sunny" },
-            { d: "SAT", h: 25, l: 16, c: "Clear" },
-            { d: "SUN", h: 32, l: 17, c: "Humid" }
-        ];
+        function updateClocks() {
+            const now = new Date();
+            const format = (tz) => now.toLocaleTimeString('en-AU', { 
+                timeZone: tz, hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' 
+            }).toUpperCase();
 
-        function initPage() {
-            // Render Forecast
-            const forecastEl = document.getElementById('forecast-render');
-            forecastData.forEach(f => {
-                forecastEl.innerHTML += `
-                    <div class="forecast-card">
-                        <div class="day-name">${f.d}</div>
-                        <div class="day-high">${f.h}°</div>
-                        <div style="font-size: 0.7rem; color: #95a5a6;">${f.l}° / ${f.c}</div>
-                    </div>
-                `;
-            });
+            // Large Local Clock (Geelong)
+            document.getElementById('local-clock').textContent = format('Australia/Melbourne');
 
-            // Start Clocks
-            setInterval(updateTimes, 1000);
-            updateTimes();
+            // World Clocks
+            document.getElementById('tz-london').textContent = format('Europe/London');
+            document.getElementById('tz-ny').textContent = format('America/New_York');
+            document.getElementById('tz-tokyo').textContent = format('Asia/Tokyo');
+            document.getElementById('tz-sydney').textContent = format('Australia/Sydney');
+            document.getElementById('tz-perth').textContent = format('Australia/Perth');
         }
 
-        function updateTimes() {
-            const zones = [
-                { id: 'clock-london', tz: 'Europe/London' },
-                { id: 'clock-ny', tz: 'America/New_York' },
-                { id: 'clock-tokyo', tz: 'Asia/Tokyo' },
-                { id: 'clock-sydney', tz: 'Australia/Sydney' },
-                { id: 'clock-perth', tz: 'Australia/Perth' }
-            ];
-
-            zones.forEach(zone => {
-                let timeStr = new Date().toLocaleTimeString('en-AU', {
-                    timeZone: zone.tz,
-                    hour12: true,
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
-                });
-                // Force AM/PM to UPPERCASE
-                document.getElementById(zone.id).textContent = timeStr.toUpperCase();
-            });
-        }
-
-        window.onload = initPage;
+        setInterval(updateClocks, 1000);
+        updateClocks();
     </script>
 </body>
 </html>
