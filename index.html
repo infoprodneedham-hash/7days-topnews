@@ -1,53 +1,161 @@
-async function refreshAllData() {
-    try {
-        const response = await fetch('/api/hub-data');
-        const data = await response.json();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Australia Hub | Geelong Live</title>
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --accent-blue: #0984e3;
+            --text-dark: #2d3436;
+            --text-light: #636e72;
+        }
 
-        // Update Weather
-        document.getElementById('main-temp').textContent = `${Math.round(data.weather.main.temp)}°C`;
-        document.getElementById('weather-desc').textContent = data.weather.weather[0].description;
-        document.getElementById('weather-details').innerHTML = `Humidity: ${data.weather.main.humidity}% | Wind: ${data.weather.wind.speed}m/s`;
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
 
-        // Update Forecast
-        const forecastContainer = document.getElementById('forecast-container');
-        forecastContainer.innerHTML = data.forecast.map(day => {
-            const d = new Date(day.dt * 1000).toLocaleDateString('en-AU', {weekday: 'short'}).toUpperCase();
-            return `
-                <div class="forecast-day">
-                    <div style="font-weight:bold; color:var(--accent-blue); font-size:0.7rem;">${d}</div>
-                    <div style="font-size:1.4rem; font-weight:800;">${Math.round(day.main.temp)}°</div>
-                    <div style="font-size:0.7rem;">${day.weather[0].main}</div>
-                </div>`;
-        }).join('');
+        .header-layout { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
+        .card { background: var(--card-bg); padding: 25px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
 
-        // Update News
-        const ausContainer = document.getElementById('aus-news-container');
-        const worldContainer = document.getElementById('world-news-container');
+        .current-temp { font-size: 4rem; font-weight: 800; margin: 5px 0; letter-spacing: -2px; }
+        .local-time-large { font-size: 2.2rem; font-weight: 700; font-family: 'Courier New', monospace; margin-bottom: 15px; }
         
-        // Split the 8 articles into Aus and World sections
-        const ausArticles = data.news.slice(0, 5);
-        const worldArticles = data.news.slice(5, 8);
+        .news-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .section-title {
+            font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px;
+            color: var(--accent-blue); margin-bottom: 20px; border-bottom: 2px solid #f0f4f8; padding-bottom: 8px;
+        }
 
-        const render = (articles) => articles.map(a => `
-            <div class="news-item">
-                <h3>${a.title}</h3>
-                <p>${a.description ? a.description.substring(0, 80) + '...' : 'Click to read more.'}</p>
+        .news-item { margin-bottom: 20px; }
+        .news-item h3 { margin: 0 0 5px 0; font-size: 0.95rem; color: #1e272e; line-height: 1.4; }
+        .news-item p { margin: 0; font-size: 0.8rem; color: var(--text-light); }
+
+        .forecast-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 10px; }
+        .forecast-day { text-align: center; padding: 15px 10px; background: #f8f9fa; border-radius: 12px; }
+
+        .world-clocks { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px; }
+        .clock-item { text-align: center; }
+        .clock-name { font-size: 0.7rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; }
+        .clock-val { display: block; font-size: 1.1rem; font-weight: 700; font-family: monospace; }
+
+        @media (max-width: 1000px) { .header-layout, .news-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <div class="header-layout">
+        <div class="card weather-box">
+            <h2>Geelong, VIC</h2>
+            <div class="current-temp" id="main-temp">--°C</div>
+            <div id="local-clock" class="local-time-large">--:--:-- --</div>
+            <div id="weather-desc" style="font-weight: 600; text-transform: capitalize;">Connecting...</div>
+            <div class="weather-details" id="weather-details" style="margin-top:10px; font-size:0.9rem; color:var(--text-light);">
+                Refreshing data...
             </div>
-        `).join('');
+        </div>
 
-        ausContainer.innerHTML = render(ausArticles);
-        worldContainer.innerHTML = render(worldArticles);
+        <div class="card">
+            <div class="news-grid">
+                <div>
+                    <div class="section-title">Local & Australia News</div>
+                    <div id="aus-news-container">Loading...</div>
+                </div>
+                <div>
+                    <div class="section-title">World Headlines</div>
+                    <div id="world-news-container">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    } catch (e) {
-        console.error("Data refresh failed", e);
-    }
-}
+    <div class="card">
+        <div class="section-title">5-Day Forecast</div>
+        <div class="forecast-row" id="forecast-container"></div>
+    </div>
 
-// Initial load
-refreshAllData();
-// Hourly update
-setInterval(refreshAllData, 3600000); 
+    <div class="card">
+        <div class="world-clocks">
+            <div class="clock-item"><span class="clock-name">London</span><span id="tz-london" class="clock-val">--:-- --</span></div>
+            <div class="clock-item"><span class="clock-name">New York</span><span id="tz-ny" class="clock-val">--:-- --</span></div>
+            <div class="clock-item"><span class="clock-name">Tokyo</span><span id="tz-tokyo" class="clock-val">--:-- --</span></div>
+            <div class="clock-item"><span class="clock-name">Sydney</span><span id="tz-sydney" class="clock-val">--:-- --</span></div>
+            <div class="clock-item"><span class="clock-name">Perth</span><span id="tz-perth" class="clock-val">--:-- --</span></div>
+        </div>
+    </div>
 
-// Keep your clock interval as it was
-setInterval(updateClocks, 1000);
-updateClocks();
+    <script>
+        // 1. Clock Logic (Updates every second locally)
+        function updateClocks() {
+            const now = new Date();
+            const format = (tz) => now.toLocaleTimeString('en-AU', { 
+                timeZone: tz, hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' 
+            }).toUpperCase();
+
+            document.getElementById('local-clock').textContent = format('Australia/Melbourne');
+            document.getElementById('tz-london').textContent = format('Europe/London');
+            document.getElementById('tz-ny').textContent = format('America/New_York');
+            document.getElementById('tz-tokyo').textContent = format('Asia/Tokyo');
+            document.getElementById('tz-sydney').textContent = format('Australia/Sydney');
+            document.getElementById('tz-perth').textContent = format('Australia/Perth');
+        }
+
+        // 2. Data Logic (Fetches from your Vercel /api/hub-data route)
+        async function refreshAllData() {
+            try {
+                const response = await fetch('/api/hub-data');
+                if (!response.ok) throw new Error('API failed');
+                const data = await response.json();
+
+                // Update Weather
+                document.getElementById('main-temp').textContent = `${Math.round(data.weather.main.temp)}°C`;
+                document.getElementById('weather-desc').textContent = data.weather.weather[0].description;
+                document.getElementById('weather-details').innerHTML = `Humidity: ${data.weather.main.humidity}% | Wind: ${data.weather.wind.speed} m/s`;
+
+                // Update Forecast
+                const forecastContainer = document.getElementById('forecast-container');
+                forecastContainer.innerHTML = data.forecast.map(day => {
+                    const d = new Date(day.dt * 1000).toLocaleDateString('en-AU', {weekday: 'short'}).toUpperCase();
+                    return `
+                        <div class="forecast-day">
+                            <div style="font-weight:bold; color:var(--accent-blue); font-size:0.7rem;">${d}</div>
+                            <div style="font-size:1.4rem; font-weight:800;">${Math.round(day.main.temp)}°</div>
+                            <div style="font-size:0.7rem; color:var(--text-light);">${day.weather[0].main}</div>
+                        </div>`;
+                }).join('');
+
+                // Update News
+                const render = (articles) => articles.map(a => `
+                    <div class="news-item">
+                        <h3>${a.title}</h3>
+                        <p>${a.description ? a.description.substring(0, 90) + '...' : 'Click to read the full story.'}</p>
+                    </div>
+                `).join('');
+
+                document.getElementById('aus-news-container').innerHTML = render(data.news.slice(0, 5));
+                document.getElementById('world-news-container').innerHTML = render(data.news.slice(5, 8));
+
+            } catch (e) {
+                console.error("Data refresh failed:", e);
+                document.getElementById('weather-desc').textContent = "Offline/Error";
+            }
+        }
+
+        // Initialize
+        setInterval(updateClocks, 1000);
+        setInterval(refreshAllData, 3600000); // Auto-update every 1 hour
+
+        updateClocks();
+        refreshAllData();
+    </script>
+</body>
+</html>
