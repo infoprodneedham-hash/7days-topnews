@@ -3,24 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Australia Hub | Geelong</title>
+    <title>Australia Hub | Geelong (No Keys)</title>
     <style>
-        /* ... Your existing CSS stays the same ... */
-        :root { --bg-color: #f0f4f8; --card-bg: #ffffff; --accent-blue: #0984e3; --text-dark: #2d3436; --text-light: #636e72; }
-        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background-color: var(--bg-color); color: var(--text-dark); margin: 0; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --accent-blue: #0984e3;
+            --text-dark: #2d3436;
+            --text-light: #636e72;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
         .header-layout { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
         .card { background: var(--card-bg); padding: 25px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+
         .current-temp { font-size: 4rem; font-weight: 800; margin: 5px 0; letter-spacing: -2px; }
-        .local-time-large { font-size: 2.2rem; font-weight: 700; color: var(--text-dark); margin-bottom: 15px; font-family: 'Courier New', monospace; }
+        .local-time-large { font-size: 2.2rem; font-weight: 700; margin-bottom: 15px; font-family: 'Courier New', monospace; }
+        
         .news-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         .section-title { font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--accent-blue); margin-bottom: 20px; border-bottom: 2px solid #f0f4f8; padding-bottom: 8px; }
+
         .news-item { margin-bottom: 20px; }
-        .forecast-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; } /* Changed to 5 for free API limits */
+        .news-item h3 { margin: 0 0 5px 0; font-size: 0.95rem; color: #1e272e; line-height: 1.4; }
+        .news-item p { margin: 0; font-size: 0.8rem; color: var(--text-light); }
+
+        .forecast-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
         .forecast-day { text-align: center; padding: 15px 10px; background: #f8f9fa; border-radius: 12px; }
-        .day-label { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); }
-        .day-temp { font-size: 1.4rem; font-weight: 800; margin: 5px 0; }
-        .world-clocks { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px; }
-        .clock-val { display: block; font-size: 1.1rem; font-weight: 700; font-family: monospace; }
+
         @media (max-width: 1000px) { .header-layout, .news-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -30,20 +49,19 @@
         <div class="card weather-box">
             <h2>Geelong, VIC</h2>
             <div id="main-temp" class="current-temp">--°C</div>
-            <div id="local-clock" class="local-time-large">--:--:-- --</div>
-            <div id="weather-desc" style="font-weight: 600; margin-bottom: 5px; text-transform: capitalize;">Loading...</div>
-            <div id="weather-details" class="weather-details">--</div>
+            <div id="local-clock" class="local-time-large">--:--:--</div>
+            <div id="weather-desc" style="font-weight: 600; text-transform: capitalize;">Updating...</div>
         </div>
 
         <div class="card">
             <div class="news-grid">
                 <div>
-                    <div class="section-title">Australia News</div>
-                    <div id="aus-news-container">Fetching headlines...</div>
+                    <div class="section-title">ABC News Australia</div>
+                    <div id="aus-news">Loading feeds...</div>
                 </div>
                 <div>
-                    <div class="section-title">World News</div>
-                    <div id="world-news-container">Fetching headlines...</div>
+                    <div class="section-title">World Headlines</div>
+                    <div id="world-news">Loading feeds...</div>
                 </div>
             </div>
         </div>
@@ -51,89 +69,82 @@
 
     <div class="card">
         <div class="section-title">5-Day Forecast</div>
-        <div id="forecast-container" class="forecast-row">
-            </div>
-    </div>
-
-    <div class="card">
-        <div class="world-clocks">
-            <div class="clock-item"><span class="clock-name">London</span><span id="tz-london" class="clock-val">--:--:-- --</span></div>
-            <div class="clock-item"><span class="clock-name">New York</span><span id="tz-ny" class="clock-val">--:--:-- --</span></div>
-            <div class="clock-item"><span class="clock-name">Tokyo</span><span id="tz-tokyo" class="clock-val">--:--:-- --</span></div>
-            <div class="clock-item"><span class="clock-name">Sydney</span><span id="tz-sydney" class="clock-val">--:--:-- --</span></div>
-            <div class="clock-item"><span class="clock-name">Perth</span><span id="tz-perth" class="clock-val">--:--:-- --</span></div>
-        </div>
+        <div id="forecast-row" class="forecast-row"></div>
     </div>
 
     <script>
-        const WEATHER_API_KEY = 'YOUR_OPENWEATHER_KEY';
-        const NEWS_API_KEY = 'YOUR_NEWS_API_KEY';
-        const CITY = 'Geelong,AU';
+        // GEELONG COORDINATES
+        const LAT = -38.1499;
+        const LON = 144.3617;
 
         // 1. Clock Logic
-        function updateClocks() {
+        function updateClock() {
             const now = new Date();
-            const format = (tz) => now.toLocaleTimeString('en-AU', { 
-                timeZone: tz, hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' 
+            document.getElementById('local-clock').textContent = now.toLocaleTimeString('en-AU', {
+                timeZone: 'Australia/Melbourne', hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit'
             }).toUpperCase();
-            document.getElementById('local-clock').textContent = format('Australia/Melbourne');
-            document.getElementById('tz-london').textContent = format('Europe/London');
-            document.getElementById('tz-ny').textContent = format('America/New_York');
-            document.getElementById('tz-tokyo').textContent = format('Asia/Tokyo');
-            document.getElementById('tz-sydney').textContent = format('Australia/Sydney');
-            document.getElementById('tz-perth').textContent = format('Australia/Perth');
         }
 
-        // 2. Fetch Data from APIs
-        async function refreshData() {
+        // 2. Weather & Forecast (Open-Meteo: No Key Needed)
+        async function fetchWeather() {
             try {
-                // Weather
-                const weatherRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${CITY}&units=metric&appid=${WEATHER_API_KEY}`);
-                const weatherData = await weatherRes.json();
-                document.getElementById('main-temp').textContent = `${Math.round(weatherData.main.temp)}°C`;
-                document.getElementById('weather-desc').textContent = weatherData.weather[0].description;
-                document.getElementById('weather-details').innerHTML = `Humidity: ${weatherData.main.humidity}%<br>Wind: ${Math.round(weatherData.wind.speed * 3.6)} km/h`;
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current_weather=true&daily=temperature_2m_max&timezone=Australia%2FSydney`;
+                const res = await fetch(url);
+                const data = await res.json();
 
-                // Forecast (5-day)
-                const forecastRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${CITY}&units=metric&appid=${WEATHER_API_KEY}`);
-                const forecastData = await forecastRes.json();
-                const dailyData = forecastData.list.filter(f => f.dt_txt.includes("12:00:00"));
-                document.getElementById('forecast-container').innerHTML = dailyData.map(day => {
-                    const date = new Date(day.dt * 1000).toLocaleDateString('en-AU', { weekday: 'short' }).toUpperCase();
-                    return `<div class="forecast-day"><div class="day-label">${date}</div><div class="day-temp">${Math.round(day.main.temp)}°</div><div style="font-size:0.7rem">${day.weather[0].main}</div></div>`;
+                document.getElementById('main-temp').textContent = `${Math.round(data.current_weather.temperature)}°C`;
+                document.getElementById('weather-desc').textContent = "Current Conditions";
+
+                const forecastContainer = document.getElementById('forecast-row');
+                forecastContainer.innerHTML = data.daily.time.slice(0, 5).map((date, i) => {
+                    const dayName = new Date(date).toLocaleDateString('en-AU', {weekday: 'short'}).toUpperCase();
+                    return `
+                        <div class="forecast-day">
+                            <div style="font-weight:bold; color:var(--accent-blue); font-size:0.7rem;">${dayName}</div>
+                            <div style="font-size:1.4rem; font-weight:800;">${Math.round(data.daily.temperature_2m_max[i])}°</div>
+                        </div>`;
                 }).join('');
-
-                // News (AU)
-                const newsAuRes = await fetch(`https://newsapi.org/v2/top-headlines?country=au&apiKey=${NEWS_API_KEY}`);
-                const newsAuData = await newsAuRes.json();
-                renderNews('aus-news-container', newsAuData.articles.slice(0, 4));
-
-                // News (World)
-                const newsWorldRes = await fetch(`https://newsapi.org/v2/top-headlines?language=en&apiKey=${NEWS_API_KEY}`);
-                const newsWorldData = await newsWorldRes.json();
-                renderNews('world-news-container', newsWorldData.articles.slice(0, 3));
-
-            } catch (error) {
-                console.error("Fetch error:", error);
-            }
+            } catch (e) { console.error("Weather Error", e); }
         }
 
-        function renderNews(id, articles) {
-            document.getElementById(id).innerHTML = articles.map(a => `
+        // 3. News (RSS to JSON: No Key Needed)
+        async function fetchNews() {
+            try {
+                // Australia News (ABC RSS)
+                const abcUrl = `https://api.rss2json.com/v1/api.json?rss_url=https://www.abc.net.au/news/feed/51120/rss.xml`;
+                const abcRes = await fetch(abcUrl);
+                const abcData = await abcRes.json();
+                renderNews('aus-news', abcData.items.slice(0, 4));
+
+                // World News (BBC RSS)
+                const bbcUrl = `https://api.rss2json.com/v1/api.json?rss_url=http://feeds.bbci.co.uk/news/world/rss.xml`;
+                const bbcRes = await fetch(bbcUrl);
+                const bbcData = await bbcRes.json();
+                renderNews('world-news', bbcData.items.slice(0, 3));
+            } catch (e) { console.error("News Error", e); }
+        }
+
+        function renderNews(id, items) {
+            document.getElementById(id).innerHTML = items.map(item => `
                 <div class="news-item">
-                    <h3>${a.title}</h3>
-                    <p>${a.description ? a.description.substring(0, 80) + '...' : ''}</p>
+                    <h3>${item.title}</h3>
+                    <p>${item.description.replace(/<[^>]*>?/gm, '').substring(0, 80)}...</p>
                 </div>
             `).join('');
         }
 
-        // Run immediately
-        updateClocks();
-        refreshData();
+        // 4. Update Loop (Every 5 Minutes)
+        function refreshAll() {
+            fetchWeather();
+            fetchNews();
+            console.log("Dashboard refreshed at " + new Date().toLocaleTimeString());
+        }
 
-        // Intervals
-        setInterval(updateClocks, 1000);
-        setInterval(refreshData, 300000); // 5 minutes (300,000 ms)
+        setInterval(updateClock, 1000);
+        setInterval(refreshAll, 300000); // 5 minutes
+
+        updateClock();
+        refreshAll();
     </script>
 </body>
 </html>
