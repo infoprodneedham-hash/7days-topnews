@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/weather/:path*",
+      "destination": "https://api.openweathermap.org/data/2.5/:path*"
+    },
+    {
+      "source": "/api/news/:path*",
+      "destination": "https://newsapi.org/v2/:path*"
+    }
+  ]
+}
