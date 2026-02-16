@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Australia Hub | Geelong</title>
+    <title>Australia Hub | Geelong Live</title>
     <style>
         :root {
             --bg-color: #f0f4f8;
@@ -37,7 +37,6 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
 
-        /* Weather Section with Large Clock */
         .weather-box h2 { margin: 0; font-size: 1.3rem; color: var(--accent-blue); }
         .current-temp { font-size: 4rem; font-weight: 800; margin: 5px 0; letter-spacing: -2px; }
         .local-time-large { 
@@ -49,7 +48,6 @@
         }
         .weather-details { font-size: 0.95rem; color: var(--text-light); line-height: 1.5; }
 
-        /* News Section */
         .news-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -69,10 +67,9 @@
         .news-item h3 { margin: 0 0 5px 0; font-size: 1rem; line-height: 1.4; color: #1e272e; }
         .news-item p { margin: 0; font-size: 0.85rem; color: var(--text-light); line-height: 1.5; }
 
-        /* Forecast Bar */
         .forecast-row {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             gap: 10px;
         }
         .forecast-day {
@@ -84,7 +81,6 @@
         .day-label { font-weight: bold; font-size: 0.75rem; color: var(--accent-blue); }
         .day-temp { font-size: 1.4rem; font-weight: 800; margin: 5px 0; }
 
-        /* World Clocks Bar */
         .world-clocks {
             display: flex;
             justify-content: space-around;
@@ -97,7 +93,6 @@
 
         @media (max-width: 1000px) {
             .header-layout, .news-grid { grid-template-columns: 1fr; }
-            .forecast-row { grid-template-columns: repeat(4, 1fr); }
         }
     </style>
 </head>
@@ -105,14 +100,14 @@
 
     <div class="header-layout">
         <div class="card weather-box">
-            <h2>Geelong, VIC</h2>
-            <div class="current-temp">17°C</div>
+            <h2 id="city-name">Geelong, VIC</h2>
+            <div class="current-temp" id="main-temp">--°C</div>
             <div id="local-clock" class="local-time-large">--:--:-- --</div>
-            <div style="font-weight: 600; margin-bottom: 5px;">Clear Skies</div>
-            <div class="weather-details">
-                Humidity: 94%<br>
-                Wind: 4 mph East<br>
-                UV Index: 0 (Night)
+            <div id="weather-desc" style="font-weight: 600; margin-bottom: 5px; text-transform: capitalize;">Loading...</div>
+            <div class="weather-details" id="weather-details">
+                Humidity: --%<br>
+                Wind: --<br>
+                UV Index: --
             </div>
         </div>
 
@@ -120,58 +115,20 @@
             <div class="news-grid">
                 <div>
                     <div class="section-title">Australia News</div>
-                    <div class="news-item">
-                        <h3>Olympic Gold for Jakara Anthony</h3>
-                        <p>Aussie moguls star secures gold at Milano Cortina 2026, leading a record Winter Games medal haul.</p>
-                    </div>
-                    <div class="news-item">
-                        <h3>Taylor Reshuffles Liberal Front Bench</h3>
-                        <p>New Opposition Leader Angus Taylor prepares a new team to focus on immigration and economic values.</p>
-                    </div>
-                    <div class="news-item">
-                        <h3>EU Trade Deal "Billions" Boost</h3>
-                        <p>Trade Minister Farrell signals a breakthrough in long-stalled talks, promising cheaper European imports.</p>
-                    </div>
-                    <div class="news-item">
-                        <h3>60 Years of Decimal Currency</h3>
-                        <p>Australia celebrates the anniversary of 'C-Day' when the dollar officially replaced the pound.</p>
-                    </div>
-                    <div class="news-item">
-                        <h3>AUKUS Shipyard Funding Confirmed</h3>
-                        <p>The PM dismisses cost concerns as the first $2.8bn is allocated for the Adelaide submarine facility.</p>
-                    </div>
+                    <div id="aus-news-container">Loading news...</div>
                 </div>
-
                 <div>
                     <div class="section-title">World News</div>
-                    <div class="news-item">
-                        <h3>Bangladesh Power Transition</h3>
-                        <p>Tarique Rahman ascends to PM following a landslide BNP victory in recent credible elections.</p>
-                    </div>
-                    <div class="news-item">
-                        <h3>T20 World Cup: West Indies Advance</h3>
-                        <p>The Windies become the first team to secure a Super Eights spot after defeating Nepal.</p>
-                    </div>
-                    <div class="news-item">
-                        <h3>US-Russia "Presidents Day" Talks</h3>
-                        <p>Global markets watch closely as new diplomatic channels open in Geneva ahead of the US holiday.</p>
-                    </div>
+                    <div id="world-news-container">Loading news...</div>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="card">
-        <div class="section-title">7-Day Forecast</div>
-        <div class="forecast-row">
-            <div class="forecast-day"><div class="day-label">MON</div><div class="day-temp">31°</div><div style="font-size:0.7rem">Sunny</div></div>
-            <div class="forecast-day"><div class="day-label">TUE</div><div class="day-temp">32°</div><div style="font-size:0.7rem">Rain</div></div>
-            <div class="forecast-day"><div class="day-label">WED</div><div class="day-temp">22°</div><div style="font-size:0.7rem">Clear</div></div>
-            <div class="forecast-day"><div class="day-label">THU</div><div class="day-temp">23°</div><div style="font-size:0.7rem">Sunny</div></div>
-            <div class="forecast-day"><div class="day-label">FRI</div><div class="day-temp">28°</div><div style="font-size:0.7rem">Warm</div></div>
-            <div class="forecast-day"><div class="day-label">SAT</div><div class="day-temp">25°</div><div style="font-size:0.7rem">Cloudy</div></div>
-            <div class="forecast-day"><div class="day-label">SUN</div><div class="day-temp">32°</div><div style="font-size:0.7rem">Humid</div></div>
-        </div>
+        <div class="section-title">5-Day Forecast</div>
+        <div class="forecast-row" id="forecast-container">
+            </div>
     </div>
 
     <div class="card">
@@ -185,16 +142,18 @@
     </div>
 
     <script>
+        // REPLACE THESE WITH YOUR KEYS
+        const WEATHER_API_KEY = 'YOUR_OPENWEATHER_KEY';
+        const NEWS_API_KEY = 'YOUR_NEWS_API_KEY';
+        const CITY = 'Geelong,AU';
+
         function updateClocks() {
             const now = new Date();
             const format = (tz) => now.toLocaleTimeString('en-AU', { 
                 timeZone: tz, hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' 
             }).toUpperCase();
 
-            // Large Local Clock (Geelong)
             document.getElementById('local-clock').textContent = format('Australia/Melbourne');
-
-            // World Clocks
             document.getElementById('tz-london').textContent = format('Europe/London');
             document.getElementById('tz-ny').textContent = format('America/New_York');
             document.getElementById('tz-tokyo').textContent = format('Asia/Tokyo');
@@ -202,8 +161,79 @@
             document.getElementById('tz-perth').textContent = format('Australia/Perth');
         }
 
-        setInterval(updateClocks, 1000);
+        async function fetchWeather() {
+            try {
+                // Current Weather
+                const currRes = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${CITY}&units=metric&appid=${WEATHER_API_KEY}`);
+                const currData = await currRes.json();
+                
+                document.getElementById('main-temp').textContent = `${Math.round(currData.main.temp)}°C`;
+                document.getElementById('weather-desc').textContent = currData.weather[0].description;
+                document.getElementById('weather-details').innerHTML = `
+                    Humidity: ${currData.main.humidity}%<br>
+                    Wind: ${currData.wind.speed} m/s<br>
+                    Pressure: ${currData.main.pressure} hPa
+                `;
+
+                // Forecast
+                const foreRes = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${CITY}&units=metric&appid=${WEATHER_API_KEY}`);
+                const foreData = await foreRes.json();
+                const container = document.getElementById('forecast-container');
+                container.innerHTML = '';
+                
+                // Filter for one forecast per day (approx noon)
+                const daily = foreData.list.filter(f => f.dt_txt.includes("12:00:00"));
+                daily.forEach(day => {
+                    const date = new Date(day.dt * 1000);
+                    const dayName = date.toLocaleDateString('en-AU', {weekday: 'short'}).toUpperCase();
+                    container.innerHTML += `
+                        <div class="forecast-day">
+                            <div class="day-label">${dayName}</div>
+                            <div class="day-temp">${Math.round(day.main.temp)}°</div>
+                            <div style="font-size:0.7rem">${day.weather[0].main}</div>
+                        </div>
+                    `;
+                });
+            } catch (e) { console.error("Weather failed", e); }
+        }
+
+        async function fetchNews() {
+            try {
+                // Aus News
+                const ausRes = await fetch(`https://newsapi.org/v2/top-headlines?country=au&apiKey=${NEWS_API_KEY}`);
+                const ausData = await ausRes.json();
+                renderNews('aus-news-container', ausData.articles.slice(0, 5));
+
+                // World News
+                const worldRes = await fetch(`https://newsapi.org/v2/top-headlines?language=en&apiKey=${NEWS_API_KEY}`);
+                const worldData = await worldRes.json();
+                renderNews('world-news-container', worldData.articles.slice(0, 3));
+            } catch (e) { console.error("News failed", e); }
+        }
+
+        function renderNews(id, articles) {
+            const container = document.getElementById(id);
+            container.innerHTML = articles.map(a => `
+                <div class="news-item">
+                    <h3>${a.title}</h3>
+                    <p>${a.description || 'No description available.'}</p>
+                </div>
+            `).join('');
+        }
+
+        // Initialize and Set Intervals
+        setInterval(updateClocks, 1000); // Clock every second
+        
+        // Data updates every 1 hour (3,600,000 ms)
+        setInterval(() => {
+            fetchWeather();
+            fetchNews();
+        }, 3600000);
+
+        // Initial Load
         updateClocks();
+        fetchWeather();
+        fetchNews();
     </script>
 </body>
 </html>
