@@ -35,7 +35,37 @@
 
         .news-item { margin-bottom: 20px; }
         .news-item h3 { margin: 0 0 5px 0; font-size: 0.95rem; color: #1e272e; line-height: 1.4; }
-        .news-item p { margin: 0; font-size: 0.8rem; color: var(--text-light); }
+        .news-item p { margin: 0; font-size: 0.8rem; color: var(--text-light); line-height: 1.5; }
+
+        .expand-btn {
+            background: none;
+            border: none;
+            color: var(--accent-blue);
+            padding: 0;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        .expand-btn:hover { text-decoration: underline; }
+
+        .world-clocks-container {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed #e2e8f0;
+        }
+        .world-clock-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+        .world-clock-time {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
 
         .forecast-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
         .forecast-day { text-align: center; padding: 15px 10px; background: #f8f9fa; border-radius: 12px; }
@@ -50,7 +80,23 @@
             <h2>Geelong, VIC</h2>
             <div id="main-temp" class="current-temp">--°C</div>
             <div id="local-clock" class="local-time-large">--:--:--</div>
-            <div id="weather-desc" style="font-weight: 600; text-transform: capitalize;">Updating...</div>
+            <div id="weather-desc" style="font-weight: 600; text-transform: capitalize; margin-bottom: 10px;">Updating...</div>
+            
+            <div class="world-clocks-container">
+                <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); margin-bottom: 10px;">World Clocks</div>
+                <div class="world-clock-row">
+                    <span style="color: var(--text-light);">London</span>
+                    <span id="clock-london" class="world-clock-time">--:--:--</span>
+                </div>
+                <div class="world-clock-row">
+                    <span style="color: var(--text-light);">New York</span>
+                    <span id="clock-ny" class="world-clock-time">--:--:--</span>
+                </div>
+                <div class="world-clock-row">
+                    <span style="color: var(--text-light);">Tokyo</span>
+                    <span id="clock-tokyo" class="world-clock-time">--:--:--</span>
+                </div>
+            </div>
         </div>
 
         <div class="card">
@@ -80,8 +126,25 @@
         // 1. Clock Logic
         function updateClock() {
             const now = new Date();
+            
+            // Local Time
             document.getElementById('local-clock').textContent = now.toLocaleTimeString('en-AU', {
                 timeZone: 'Australia/Melbourne', hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit'
+            }).toUpperCase();
+
+            // International Clocks
+            const timeOptions = { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            
+            document.getElementById('clock-london').textContent = now.toLocaleTimeString('en-GB', {
+                ...timeOptions, timeZone: 'Europe/London'
+            }).toUpperCase();
+            
+            document.getElementById('clock-ny').textContent = now.toLocaleTimeString('en-US', {
+                ...timeOptions, timeZone: 'America/New_York'
+            }).toUpperCase();
+            
+            document.getElementById('clock-tokyo').textContent = now.toLocaleTimeString('ja-JP', {
+                ...timeOptions, timeZone: 'Asia/Tokyo'
             }).toUpperCase();
         }
 
@@ -125,12 +188,41 @@
         }
 
         function renderNews(id, items) {
-            document.getElementById(id).innerHTML = items.map(item => `
-                <div class="news-item">
-                    <h3>${item.title}</h3>
-                    <p>${item.description.replace(/<[^>]*>?/gm, '').substring(0, 80)}...</p>
-                </div>
-            `).join('');
+            document.getElementById(id).innerHTML = items.map(item => {
+                const cleanDesc = item.description.replace(/<[^>]*>?/gm, '');
+                const isLongText = cleanDesc.length > 80;
+                const shortDesc = isLongText ? cleanDesc.substring(0, 80) + '...' : cleanDesc;
+
+                return `
+                    <div class="news-item">
+                        <h3>${item.title}</h3>
+                        <p>
+                            <span class="text-short">${shortDesc}</span>
+                            ${isLongText ? `
+                                <span class="text-full" style="display: none;">${cleanDesc}</span>
+                                <button class="expand-btn" onclick="toggleHeadline(this)">Read More</button>
+                            ` : ''}
+                        </p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // headline text toggle logic
+        function toggleHeadline(btn) {
+            const container = btn.parentElement;
+            const shortSpan = container.querySelector('.text-short');
+            const fullSpan = container.querySelector('.text-full');
+            
+            if (fullSpan.style.display === 'none') {
+                fullSpan.style.display = 'inline';
+                shortSpan.style.display = 'none';
+                btn.textContent = 'Read Less';
+            } else {
+                fullSpan.style.display = 'none';
+                shortSpan.style.display = 'inline';
+                btn.textContent = 'Read More';
+            }
         }
 
         // 4. Update Loop (Every 5 Minutes)
